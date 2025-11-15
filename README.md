@@ -54,4 +54,3 @@ KNotes is a notes application specifically designed to work on Kindle e-readers.
 ## Credits
 - App by [kurizu](https://kurizu.vercel.app/)
 - Illusion engine by [Penguins184](https://github.com/polish-penguin-dev/)
-- Additional development by [kbarni](https://github.com/kbarni)
