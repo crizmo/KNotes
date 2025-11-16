@@ -173,6 +173,9 @@ function selectNote(name) {
         document.getElementById("note-content").value = content;
     });
 
+    document.getElementById('editor').style.display = 'block'; // Show editor when selecting a note
+    document.getElementById('toggle-editor').textContent = 'Hide Editor';
+
     loadNotesList(); // Refresh to show active state
 }
 
@@ -253,6 +256,8 @@ function confirmDelete() {
         document.getElementById("note-content").value = "";
         document.getElementById("save-button").disabled = true;
         document.getElementById("delete-button").disabled = true;
+        document.getElementById('editor').style.display = 'none'; // Hide editor after delete
+        document.getElementById('toggle-editor').textContent = 'Show Editor';
         loadNotesList();
         closeDeleteModal();
     });
@@ -265,4 +270,41 @@ function closeDeleteModal() {
 //Logic
 function onPageLoad() {
     loadNotesList();
+    document.getElementById('toggle-editor').textContent = 'Hide Editor'; // Since editor is visible by default
+
+    // Handle viewport changes for mobile keyboard
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', adjustTextareaForKeyboard);
+        var textarea = document.getElementById('note-content');
+        textarea.addEventListener('focus', adjustTextareaForKeyboard);
+        textarea.addEventListener('input', adjustTextareaForKeyboard); // Adjust as you type
+        textarea.addEventListener('blur', resetTextarea);
+    }
+}
+
+function toggleEditor() {
+    var editor = document.getElementById('editor');
+    var button = document.getElementById('toggle-editor');
+    if (editor.style.display === 'none') {
+        editor.style.display = 'block';
+        button.textContent = 'Hide Editor';
+    } else {
+        editor.style.display = 'none';
+        button.textContent = 'Show Editor';
+    }
+}
+
+function adjustTextareaForKeyboard() {
+    var textarea = document.getElementById('note-content');
+    if (document.activeElement === textarea && window.visualViewport) {
+        if (textarea.scrollHeight > 80) { // Adjust after content exceeds ~3-4 lines height
+            textarea.style.minHeight = (window.visualViewport.height - 200) + 'px';
+            textarea.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+    }
+}
+
+function resetTextarea() {
+    var textarea = document.getElementById('note-content');
+    textarea.style.minHeight = ''; // Reset to original
 }

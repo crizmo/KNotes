@@ -18,13 +18,7 @@
     <div id="app-container">
         <div id="message" class="message"></div>
 
-        <div id="notes-list" class="notes-list">
-            <h2>Your Notes</h2>
-            <div id="notes-container">
-                <!-- Notes will be populated by JavaScript -->
-            </div>
-            <button id="new-note-button" onclick="createNewNote()">New Note</button>
-        </div>
+        <button id="toggle-editor" onclick="toggleEditor()">Show Editor</button>
 
         <div id="editor" class="editor">
             <div class="editor-header">
@@ -35,6 +29,14 @@
                 </div>
             </div>
             <textarea id="note-content" placeholder="Start writing your note here..."></textarea>
+        </div>
+
+        <div id="notes-list" class="notes-list">
+            <h2>Your Notes</h2>
+            <div id="notes-container">
+                <!-- Notes will be populated by JavaScript -->
+            </div>
+            <button id="new-note-button" onclick="createNewNote()">New Note</button>
         </div>
     </div>
 
