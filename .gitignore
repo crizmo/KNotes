@@ -1,3 +1,7 @@
 KNotes/notes/*
+
+# include notes/start.knt
+!KNotes/notes/start.knt
+
 KNotes/cookieJar
 /backup
