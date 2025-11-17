@@ -1,8 +1,8 @@
-# KNotes
+# KNotes - Notes for Kindle e-readers
 <img width="30%" height="auto" alt="image" src="https://github.com/user-attachments/assets/27371b85-e4e7-499e-8ffa-3698e1450cf5" />
 <img width="30%" height="auto" alt="image" src="https://github.com/user-attachments/assets/61420304-4b32-4b15-bb7f-4f405656aa0d" />
 
-Notes for Kindle e-readers.<br />
+## Support
 <p>
   <a href="https://ko-fi.com/kurizu" target="_blank">
     <img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi" />
@@ -52,3 +52,11 @@ KNotes is a notes application specifically designed to work on Kindle e-readers.
 ## Credits
 - App by [kurizu](https://kurizu.vercel.app/)
 - Illusion engine by [Penguins184](https://github.com/polish-penguin-dev/)
+
+## Support
+<p>
+  <a href="https://ko-fi.com/kurizu" target="_blank">
+    <img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi" />
+  </a>
+</p>
+
