@@ -127,6 +127,161 @@ function _delete(name) {
 // Global variables
 var currentNote = null;
 var notesList = [];
+var kanbanData = { todo: [], inprogress: [], done: [] };
+var currentKanbanColumn = null;
+
+// View switching
+function showNotesView() {
+    document.getElementById('app-container').style.display = 'block';
+    document.getElementById('kanban-board').style.display = 'none';
+    document.getElementById('notes-view-btn').classList.add('active');
+    document.getElementById('kanban-view-btn').classList.remove('active');
+}
+
+function showKanbanView() {
+    document.getElementById('app-container').style.display = 'none';
+    document.getElementById('kanban-board').style.display = 'block';
+    document.getElementById('notes-view-btn').classList.remove('active');
+    document.getElementById('kanban-view-btn').classList.add('active');
+    loadKanbanBoard();
+}
+
+// Kanban functions
+function loadKanbanBoard() {
+    // console.log("Loading kanban board...");
+    // kanbanData = { todo: [
+    //     { title: "Coding" },
+    //     { title: "Drawing" }
+    // ], inprogress: [
+    //     { title: "Painting" }
+    // ], done: [
+    //     { title: "Completed" }
+    // ] }; 
+    // renderKanbanBoard();
+    _read('kanban.kbn').then(function(data) {
+        if (data) {
+            try {
+                kanbanData = JSON.parse(data);
+            } catch (e) {
+                kanbanData = { todo: [], inprogress: [], done: [] };
+            }
+        } else {
+            kanbanData = { todo: [], inprogress: [], done: [] };
+        }
+        // console.log(kanbanData);
+        renderKanbanBoard();
+    }).catch(function() {
+        kanbanData = { todo: [], inprogress: [], done: [] };
+        // console.log("Failed to load kanban data, initializing empty board.");
+        renderKanbanBoard();
+    });
+}
+
+function renderKanbanBoard() {
+    var list = document.getElementById('kanban-list');
+    list.innerHTML = '';
+
+    // Add all cards from all columns
+    kanbanData.todo.forEach(function(card, index) {
+        addCardToList('todo', card, index);
+    });
+    kanbanData.inprogress.forEach(function(card, index) {
+        addCardToList('inprogress', card, index);
+    });
+    kanbanData.done.forEach(function(card, index) {
+        addCardToList('done', card, index);
+    });
+}
+
+function getStatusText(column) {
+    switch(column) {
+        case 'todo': return 'To Do';
+        case 'inprogress': return 'In Progress';
+        case 'done': return 'Done';
+        default: return '';
+    }
+}
+
+function addCardToList(column, card, index) {
+    var cardDiv = document.createElement('div');
+    cardDiv.className = 'kanban-card';
+    cardDiv.dataset.index = index;
+    cardDiv.dataset.column = column;
+
+    var titleDiv = document.createElement('div');
+    titleDiv.className = 'card-title';
+    titleDiv.textContent = card.title;
+    cardDiv.appendChild(titleDiv);
+
+    var statusDiv = document.createElement('div');
+    statusDiv.className = 'card-status';
+    statusDiv.textContent = getStatusText(column);
+    cardDiv.appendChild(statusDiv);
+
+    var buttonContainer = document.createElement('div');
+    buttonContainer.className = 'card-buttons';
+
+    var deleteBtn = document.createElement('button');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.textContent = '✕';
+    deleteBtn.onclick = function(e) {
+        e.stopPropagation();
+        deleteCard(column, index);
+    };
+    buttonContainer.appendChild(deleteBtn);
+
+    var moveBtn = document.createElement('button');
+    moveBtn.className = 'move-btn';
+    if (column === 'todo') {
+        moveBtn.textContent = '▶';
+        moveBtn.onclick = function(e) {
+            e.stopPropagation();
+            moveCard(column, index, 'inprogress');
+        };
+    } else if (column === 'inprogress') {
+        moveBtn.textContent = '✓';
+        moveBtn.onclick = function(e) {
+            e.stopPropagation();
+            moveCard(column, index, 'done');
+        };
+    } else if (column === 'done') {
+        moveBtn.textContent = '↺';
+        moveBtn.onclick = function(e) {
+            e.stopPropagation();
+            moveCard(column, index, 'inprogress');
+        };
+    }
+    buttonContainer.appendChild(moveBtn);
+
+    cardDiv.appendChild(buttonContainer);
+    document.getElementById('kanban-list').appendChild(cardDiv);
+}
+
+function getStatusText(column) {
+    switch(column) {
+        case 'todo': return 'To Do';
+        case 'inprogress': return 'In Progress';
+        case 'done': return 'Done';
+        default: return '';
+    }
+}
+
+function saveKanbanBoard() {
+    _write('kanban.kbn', JSON.stringify(kanbanData)).then(function() {
+        showMessage('Saved Kanban!');
+    });
+}
+
+function deleteCard(column, index) {
+    kanbanData[column].splice(index, 1);
+    renderKanbanBoard();
+}
+
+function moveCard(fromColumn, index, toColumn) {
+    var card = kanbanData[fromColumn].splice(index, 1)[0];
+    kanbanData[toColumn].push(card);
+    renderKanbanBoard();
+}
 
 // UI Functions
 function showMessage(text, type) {
@@ -228,8 +383,47 @@ function closeCreateModal() {
     document.getElementById("create-modal").style.display = "none";
 }
 
-function closeCreateModal() {
-    document.getElementById("create-modal").style.display = "none";
+function addCard(column) {
+    if (!column) column = 'todo';
+    currentKanbanColumn = column;
+    document.getElementById('kanban-modal').style.display = 'block';
+    var input = document.getElementById('new-card-title');
+    input.focus();
+    
+    // Add keyboard support
+    var handleKeyPress = function(e) {
+        if (e.key === "Enter") {
+            confirmAddCard();
+        } else if (e.key === "Escape") {
+            closeKanbanModal();
+        }
+    };
+    input.addEventListener("keydown", handleKeyPress);
+    
+    // Store the handler to remove it later
+    input._keyHandler = handleKeyPress;
+}
+
+function confirmAddCard() {
+    var title = document.getElementById('new-card-title').value.trim();
+    if (title && currentKanbanColumn) {
+        kanbanData[currentKanbanColumn].push({ title: title });
+        renderKanbanBoard();
+        closeKanbanModal();
+    } else {
+        showMessage('Please enter a card title!', 'error');
+    }
+}
+
+function closeKanbanModal() {
+    var input = document.getElementById('new-card-title');
+    if (input._keyHandler) {
+        input.removeEventListener("keydown", input._keyHandler);
+        delete input._keyHandler;
+    }
+    document.getElementById('kanban-modal').style.display = 'none';
+    document.getElementById('new-card-title').value = '';
+    currentKanbanColumn = null;
 }
 
 function saveNote() {
@@ -271,6 +465,7 @@ function closeDeleteModal() {
 function onPageLoad() {
     loadNotesList();
     document.getElementById('toggle-editor').textContent = 'Hide Editor'; // Since editor is visible by default
+    showNotesView(); // Default to notes view
 
     // Handle viewport changes for mobile keyboard
     if (window.visualViewport) {

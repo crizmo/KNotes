@@ -15,6 +15,11 @@
 
     <h1>KNotes v1.0</h1>
 
+    <div id="view-buttons">
+        <button id="notes-view-btn" onclick="showNotesView()" class="active">Notes</button>
+        <button id="kanban-view-btn" onclick="showKanbanView()">Kanban</button>
+    </div>
+
     <div id="app-container">
         <div id="message" class="message"></div>
 
@@ -40,6 +45,16 @@
         </div>
     </div>
 
+    <div id="kanban-board" style="display:none;">
+        <div id="kanban-controls">
+            <button id="save-kanban-btn" onclick="saveKanbanBoard()">Save Kanban</button>
+            <button id="add-card-btn" onclick="addCard('todo')">Add Card</button>
+        </div>
+        <div id="kanban-list">
+            <!-- Cards will be populated by JavaScript -->
+        </div>
+    </div>
+
     <div id="delete-modal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeDeleteModal()">&times;</span>
@@ -56,6 +71,16 @@
             <input type="text" id="new-note-name" placeholder="Note name" maxlength="50">
             <button onclick="confirmCreateNote()">Create</button>
             <button onclick="closeCreateModal()">Cancel</button>
+        </div>
+    </div>
+
+    <div id="kanban-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeKanbanModal()">&times;</span>
+            <p>Enter a title for your new card:</p>
+            <input type="text" id="new-card-title" placeholder="Card title" maxlength="100">
+            <button onclick="confirmAddCard()">Add</button>
+            <button onclick="closeKanbanModal()">Cancel</button>
         </div>
     </div>
 
